@@ -4,7 +4,7 @@ An interactive English-language data story built on the DO App Kit. It combines 
 
 ## Open the standalone interactive preview
 
-Open [`interactive-preview.html`](./interactive-preview.html) in a modern browser for a self-contained interactive dashboard using the included TfL 2025 data. It works without installing packages. Select a borough in the filters, then turn on "Show casualty points" to expand and zoom the map to that borough; hover a borough or point for details.
+Open the [live interactive preview](https://ada-sh3526.github.io/London-cycle-safety/interactive-preview.html) in a modern browser for a self-contained interactive dashboard using the included TfL 2025 data. in a modern browser for a self-contained interactive dashboard using the included TfL 2025 data. It works without installing packages. Select a borough in the filters, then turn on "Show casualty points" to expand and zoom the map to that borough; hover a borough or point for details.
 
 ## Run the app
 
