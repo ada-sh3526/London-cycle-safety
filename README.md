@@ -1,53 +1,45 @@
-# DO App Kit
+# How Safe Is Cycling in London?
 
-A starter for creating DO custom applications.
+An interactive English-language data story built on the DO App Kit. It combines TfL's 2025 cyclist casualty extract with the official TfL injury-risk annex, so the dashboard can distinguish recorded counts from exposure-adjusted rates.
 
-This starter repo is built with Vite+.
+## Open the standalone interactive preview
 
-## Runtime Context Note (Top-Level vs Iframe)
+Open [`interactive-preview.html`](./interactive-preview.html) in a modern browser for a self-contained interactive dashboard using the included TfL 2025 data. It works without installing packages. Select a borough in the filters, then turn on "Show casualty points" to expand and zoom the map to that borough; hover a borough or point for details.
 
-Data Observatory deployments may render an app either:
+## Run the app
 
-- as a top-level document, or
-- inside one or more iframes (for multi-screen orchestration/simulation).
-
-This matters for graphics-heavy features: iframe-based deployments can increase pressure on
-browser/GPU context limits (especially with WebGL). For that reason, this example includes
-runtime-aware rendering decisions and fallback strategies so behavior remains stable in both modes.
-
-## Stack Used In This Example
-
-The example app in `apps/website` focuses on three package groups:
-
-- `@tanstack/react-router`: file-based routing and route-level app structure (`/`, `/control`, `/screen`, `/bus`).
-- `@tanstack/pacer`: throttling of high-frequency control events before broadcast (for example slider updates).
-- Mapping stack:
-  `maplibre-gl`, `@vis.gl/react-maplibre`, `@deck.gl/core`, `@deck.gl/layers`, `@deck.gl/react`.
-  These are used to render the map, draw animated paths/markers, and support both richer and iframe-safe rendering paths. We strongly recommend the use of Deck.GL with MapLibre as the DO natively supports them.
-- `vite-plus` (`vp`): monorepo task runner/repo manager used for project commands (`vp run dev`, `vp run build -r`, etc.).
-
-## Development
-
-- Check everything is ready:
+Requirements: Node.js 22.12+ and pnpm 10.33+.
 
 ```bash
-vp run ready
+pnpm install
+pnpm dev
 ```
 
-- Run the tests:
+Open the local URL printed by Vite. The root route is the interactive dashboard; `/screen` is a fullscreen wall view. The app reads the cyclist dataset at `apps/website/public/data/london-cyclist-safety-2025.json` and the official borough polygons at `apps/website/public/data/london-boroughs.geojson`. The self-contained preview embeds both files.
+
+## Rebuild the data product
+
+Download TfL's 2025 GLA attendant CSV, casualty CSV and Injury Risk Annex workbook from [TfL Road Safety](https://tfl.gov.uk/corporate/publications-and-reports/road-safety) and place them in `data/` with these exact filenames:
+
+- `tfl-attendant-2025.csv`
+- `tfl-casualty-2025.csv`
+- `tfl-injury-risk-annex-2025.xlsx`
+
+The map boundary file `apps/website/public/data/london-boroughs.geojson` comes from the [GLA London Boroughs layer](https://data.london.gov.uk/dataset/london-boroughs-e55pw), derived from Ordnance Survey Boundary-Line and licensed under OGL v3. It is included with the project. Borough totals are matched to official boundary names; the fill is a count choropleth. Severity-coloured casualty dots transform TfL's OSGB36 / British National Grid coordinates to WGS84 using the Ordnance Survey seven-parameter Helmert operation (EPSG:1314; about 3.5 m transformation accuracy). This does not establish the accuracy of TfL's source incident locations.
+
+Then run:
 
 ```bash
-vp run test -r
+python -m pip install -r requirements.txt
+python analyze_cycling_safety.py
 ```
 
-- Build the monorepo:
+The script filters casualty rows to `Casualty Mode of Travel = Pedal Cycle`, joins attendant records by `_Collision Id`, derives descriptive summaries, reads the published injury, fatality and KSI rates from Tables 1-3 of the annex and journey exposure from Table 6, and writes the compact JSON consumed by the dashboard. Raw source files are not needed to run the app once that JSON is present.
 
-```bash
-vp run build -r
-```
+## Main finding
 
-- Run the development server:
+TfL's annex reports 2.19 cyclist killed-or-seriously-injured casualties per million cycle journey stages in 2025. This is 6.9% above 2024 (2.05) and 17.4% below TfL's 2010-14 average (2.65). TfL estimates 546.1 million cycle journey stages in 2025, up 12.4% from 2024. Separately, the casualty extract contains 5,675 cyclist casualties in 5,614 distinct collisions: 6 fatal, 1,196 serious and 4,473 slight. Westminster has the highest raw borough count (465). Borough counts are not risk rates.
 
-```bash
-vp run dev
-```
+The two TfL products are reported separately: the displayed London-wide risk rate is taken directly from the official annex, not recomputed from casualty-extract totals, and is not borough-specific. Counts describe TfL-recorded personal-injury collisions; they do not include near misses or damage-only incidents. Raw Easting/Northing are retained in the JSON. The coordinate-transformation accuracy does not describe the source incident-location accuracy.
+
+See [ANALYSIS.md](./ANALYSIS.md) for the full question, method, findings, caveats and next research steps.

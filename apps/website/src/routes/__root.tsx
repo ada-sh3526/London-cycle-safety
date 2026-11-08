@@ -21,11 +21,11 @@ export const Route = createRootRouteWithContext()({
                 content: 'width=device-width, initial-scale=1'
             },
             {
-                title: 'DO app'
+                title: 'How Safe Is Cycling in London?'
             },
             {
                 name: 'description',
-                content: 'A minimal DO app starter'
+                content: 'An interactive data story exploring cyclist injury collisions in London.'
             }
         ],
         links: [

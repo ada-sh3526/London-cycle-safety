@@ -26,3 +26,8 @@ dist-ssr
 # Dependency directories and files
 node_modules
 .vite*/
+# Generated production build
+.output/
+
+# Local pnpm content-addressable cache
+.pnpm-store/
